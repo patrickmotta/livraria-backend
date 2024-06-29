@@ -24,4 +24,8 @@ router.delete("/delete/:id",
    BookController.delete
 )
 
+
+router.get("/byPublisher",
+   BookController.byPublisher
+)
 export default router

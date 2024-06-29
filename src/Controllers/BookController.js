@@ -1,83 +1,95 @@
+import Book from "../Models/Book.js";
+import { author } from "../Models/Author.js"
 
-const books = []
-let idBooks = 0;
+class BookController {
 
-const BookController = {
-   getBook: async (id) =>{
-      id = Number(id)
-      const book = books.find(bk => bk.id == id)
+   static async  getAll (req, res){
 
-      return book;
-   },
+     const DBBooks = await Book.find()
 
-   getAll: async (req, res) =>{
-     
-      res.status(200).json(books)
-   },
-   create: async (req, res) =>{
-      const { title, description, price } = req.body
-      
-      books.push({
-         id: idBooks,
-         title,
-         description,
-         price
-      })
+      res.status(200).json(DBBooks)
+   }
 
+   static async  create (req, res){
+      const { title, description, price, authorId } = req.body
+      try{
+         const DBAuthor = await author.findById(authorId)
 
-      idBooks++;
+         if(!DBAuthor){
+            res.status(403).json("author Not Found")
+         }
 
-      res.status(200).json("Successfully registered book.")
-   },
-   getOne: async (req, res) =>{
+         const newBook = await Book.create({
+            title,
+            description,
+            price,
+            author:{
+               ...DBAuthor._doc
+            }
+         })
+         
+         res.status(200).json("Successfully registered book.")
+      }catch(error){
+         res.status(500).json({message: `${error.message}`})
+      }
+   }
+
+   static async getOne (req, res){
+   
       let { id } = req.params
-      id = Number(id)
-      const book = await BookController.getBook(id);
+      const book = await Book.findById(id)
       
       if(!book){
          res.status(403).json("Book Not Found")
       }
       res.status(200).json(book)
-   },
-   update: async (req , res) =>{
+   }
 
-      let { id } = req.params
-      id = Number(id)
-      const { title, description, price } = req.body
+   static async update (req , res){
+      try{
 
-      const book = await BookController.getBook(id);
-
-      if(!book){
-         res.status(403).json("Book Not Found")
+         let { id } = req.params
+         const { title, description, price } = req.body
+         
+         const book = await Book.findByIdAndUpdate(id,{
+            title,
+            description,
+            price
+         });
+         
+         if(!book){
+            res.status(403).json("Book Not Found")
+         }
+         
+         res.status(200).json("updated")
+      }catch(error){
+         res.status(500).json({message: `${error.message}`})
       }
+   }
 
-      const updateBook = {
-         id: id,
-         title,
-         description,
-         price
+   static async delete (req, res){
+      const { id } = req.params
+       
+      try{
+         await Book.findByIdAndDelete(id)
+
+         res.status(200).json("Deleted")
+      }catch(error){
+         res.status(500).json({message: `${error.message}`})
       }
-
-      books[book.id] = updateBook
-
-      res.status(200).json("updated")
-   },
-   delete: async (req, res) =>{
-      let { id } = req.params
-      id = Number(id)
-
-      const book = await BookController.getBook(id)
-
-      if(!book){
-         res.status(403).json("Book Not Found")
-      }
-
-
-      books.splice(id, 1)
-
-      res.status(200).json("Deleted")
    }
    
+   static async byPublisher(req, res){
+      const { publisher } = req.query
+
+      try{
+         const booksByPublisher = await Book.find({ publisher: publisher })
+
+         res.status(200).json(booksByPublisher)
+      }catch(error){
+         res.status(500).json({message: `${error.message}`})
+      }
+   }
 }
 
 export default BookController
