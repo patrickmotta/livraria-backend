@@ -1,11 +1,11 @@
-import Book from "../Models/Book.js";
+import Book from "../Models/Book.js"
 import { author } from "../Models/Author.js"
 
 class BookController {
 
    static async  getAll (req, res){
 
-     const DBBooks = await Book.find()
+      const DBBooks = await Book.find()
 
       res.status(200).json(DBBooks)
    }
@@ -55,7 +55,7 @@ class BookController {
             title,
             description,
             price
-         });
+         })
          
          if(!book){
             res.status(403).json("Book Not Found")

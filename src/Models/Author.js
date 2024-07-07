@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "mongoose"
 
 const authorSchema = new mongoose.Schema({
    id: { type: mongoose.Types.ObjectId },
@@ -11,4 +11,4 @@ const authorSchema = new mongoose.Schema({
 
 const author = mongoose.model("authors", authorSchema)
 
-export {author, authorSchema};
+export {author, authorSchema}

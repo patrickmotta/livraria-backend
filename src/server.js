@@ -1,6 +1,6 @@
-import express from "express";
+import express from "express"
 import Routes from "./Routes/index.js"
-import MongoDBConnect from "./Database/config/MongoDBConnect.js";
+import MongoDBConnect from "./Database/config/MongoDBConnect.js"
 
 
 const mongodb = await MongoDBConnect()

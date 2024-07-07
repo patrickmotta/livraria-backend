@@ -1,10 +1,10 @@
-import { author } from "../Models/Author.js";
+import { author } from "../Models/Author.js"
 
 class AuthorController {
 
    static async  getAll (req, res){
 
-     const DBAuthors = await author.find()
+      const DBAuthors = await author.find()
 
       res.status(200).json(DBAuthors)
    }
@@ -44,7 +44,7 @@ class AuthorController {
          const DBAuthor = await author.findByIdAndUpdate(id,{
             name,
             nationality
-         });
+         })
          
          if(!DBAuthor){
             res.status(403).json("Author Not Found")

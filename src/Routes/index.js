@@ -1,13 +1,13 @@
-import { Router } from "express";
-import BookRoutes from './Book.routes.js'
+import { Router } from "express"
+import BookRoutes from "./Book.routes.js"
 import AuthorRoutes from "../Routes/Author.routes.js"
-const router = Router();
+const router = Router()
 
-router.use('/book',
+router.use("/book",
    BookRoutes
 )
 
-router.use('/author',
+router.use("/author",
    AuthorRoutes
 )
 

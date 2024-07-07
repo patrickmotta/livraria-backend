@@ -1,5 +1,5 @@
-import { Router } from "express";
-import AuthorController from '../Controllers/AuthorController.js'
+import { Router } from "express"
+import AuthorController from "../Controllers/AuthorController.js"
 
 const router = Router()
 
