@@ -1,25 +1,31 @@
 import Book from "../Models/Book.js"
 import { author } from "../Models/Author.js"
+import AplicationError from "../errors/AplicationError.js"
+import NotFound from "../errors/NotFound.js"
 
 class BookController {
 
    static async  getAll (req, res){
+      try{
 
-      const DBBooks = await Book.find()
-
-      res.status(200).json(DBBooks)
+         const DBBooks = await Book.find()
+         
+         res.status(200).json(DBBooks)
+      }catch(error){
+         throw new AplicationError(error.message)
+      }
    }
 
    static async  create (req, res){
-      const { title, description, price, authorId } = req.body
       try{
+         const { title, description, price, authorId } = req.body
          const DBAuthor = await author.findById(authorId)
 
          if(!DBAuthor){
-            res.status(403).json("author Not Found")
+            throw new NotFound("author Not Found")
          }
 
-         const newBook = await Book.create({
+         await Book.create({
             title,
             description,
             price,
@@ -30,19 +36,23 @@ class BookController {
          
          res.status(200).json("Successfully registered book.")
       }catch(error){
-         res.status(500).json({message: `${error.message}`})
+         throw new AplicationError(error.message)
       }
    }
 
    static async getOne (req, res){
-   
-      let { id } = req.params
-      const book = await Book.findById(id)
-      
-      if(!book){
-         res.status(403).json("Book Not Found")
+      try{
+         let { id } = req.params
+         const book = await Book.findById(id)
+         
+         if(!book){
+            res.status(403).json("Book Not Found")
+         }
+
+         res.status(200).json(book)
+      }catch(error){
+         throw new AplicationError(error.message)
       }
-      res.status(200).json(book)
    }
 
    static async update (req , res){
@@ -58,12 +68,12 @@ class BookController {
          })
          
          if(!book){
-            res.status(403).json("Book Not Found")
+            throw new NotFound("Livro não encontrado")
          }
          
          res.status(200).json("updated")
       }catch(error){
-         res.status(500).json({message: `${error.message}`})
+         throw new AplicationError(error.message)
       }
    }
 
@@ -75,7 +85,7 @@ class BookController {
 
          res.status(200).json("Deleted")
       }catch(error){
-         res.status(500).json({message: `${error.message}`})
+         throw new AplicationError(error.message)
       }
    }
    
@@ -85,9 +95,13 @@ class BookController {
       try{
          const booksByPublisher = await Book.find({ publisher: publisher })
 
+         if(!booksByPublisher){
+            throw new NotFound("Livro não encontrado")
+         }
+
          res.status(200).json(booksByPublisher)
       }catch(error){
-         res.status(500).json({message: `${error.message}`})
+         throw new AplicationError(error.message)
       }
    }
 }

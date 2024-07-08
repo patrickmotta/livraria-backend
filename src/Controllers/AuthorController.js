@@ -1,17 +1,23 @@
 import { author } from "../Models/Author.js"
+import AplicationError from "../errors/AplicationError.js"
+import NotFound from "../errors/NotFound.js"
 
 class AuthorController {
 
    static async  getAll (req, res){
+      try{
 
-      const DBAuthors = await author.find()
-
-      res.status(200).json(DBAuthors)
+         const DBAuthors = await author.find()
+         
+         res.status(200).json(DBAuthors)
+      }catch(error){
+         throw new AplicationError(error.message)
+      }
    }
 
    static async  create (req, res){
-      const { name, nationality } = req.body
       try{
+         const { name, nationality } = req.body
 
          await author.create({
             name,
@@ -20,19 +26,23 @@ class AuthorController {
          
          res.status(200).json("Successfully registered author.")
       }catch(error){
-         res.status(500).json({message: `${error.message}`})
+         throw new AplicationError(error.message)
       }
    }
 
    static async getOne (req, res){
-   
-      let { id } = req.params
-      const DBAuthor = await author.findById(id)
-      
-      if(!DBAuthor){
-         res.status(403).json("Author Not Found")
+      try{
+
+         let { id } = req.params
+         const DBAuthor = await author.findById(id)
+         
+         if(!DBAuthor){
+            throw new NotFound("Author Not Found")
+         }
+         res.status(200).json(DBAuthor)
+      }catch(error){
+         throw new AplicationError(error.message)
       }
-      res.status(200).json(DBAuthor)
    }
 
    static async update (req , res){
@@ -47,12 +57,12 @@ class AuthorController {
          })
          
          if(!DBAuthor){
-            res.status(403).json("Author Not Found")
+            throw new NotFound("Author Not Found")
          }
          
          res.status(200).json("updated")
       }catch(error){
-         res.status(500).json({message: `${error.message}`})
+         throw new AplicationError(error.message)
       }
    }
 
@@ -65,7 +75,7 @@ class AuthorController {
 
          res.status(200).json("Deleted")
       }catch(error){
-         res.status(500).json({message: `${error.message}`})
+         throw new AplicationError(error.message)
       }
    }
 
