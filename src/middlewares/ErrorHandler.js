@@ -17,7 +17,6 @@ export default function ErrorHandler(error, req, res, next) {
    }
 
    if (error instanceof AplicationError) {
-      console.log(error)
       res.status(error.status || 500).json({
          message: error.message,
          error: error.error

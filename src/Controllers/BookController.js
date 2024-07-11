@@ -7,8 +7,21 @@ class BookController {
 
    static async  getAll (req, res){
       try{
+         let { limit = 2, page = 1, orderBy = "title", order = "asc"} = req.query
+         
+         limit = parseInt(limit)
+         page = parseInt(page)
+         order = order.toUpperCase()
+         if(limit < 0 || page < 0 || isNaN(limit) || isNaN(page) ){
+            throw new NotFound("Apenas números igual ou maior que 0 são permitidos na paginação")
+         }
 
          const DBBooks = await Book.find()
+            .sort({[orderBy]: order == "ASC" ? 1 : -1})
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .populate("author")
+            .exec()
          
          res.status(200).json(DBBooks)
       }catch(error){
@@ -89,17 +102,35 @@ class BookController {
       }
    }
    
-   static async byPublisher(req, res){
-      const { publisher } = req.query
+   static async byFilter(req, res){
+      const { publisher, title, authorName } = req.query
 
       try{
-         const booksByPublisher = await Book.find({ publisher: publisher })
 
-         if(!booksByPublisher){
+         const filters = {}
+         if(publisher){
+            filters.publisher = publisher
+         }
+         if(title){
+            filters.title = { 
+               $regex: title, 
+               $options: "i" 
+            }
+         }
+         if(authorName){
+            const authorDb = await author.findOne({ name: authorName})
+            if(authorDb){
+               filters.author = authorDb._id
+            }
+         }
+
+         const booksByFilter = await Book.find(filters).populate("authors")
+         
+         if(!booksByFilter){
             throw new NotFound("Livro não encontrado")
          }
 
-         res.status(200).json(booksByPublisher)
+         res.status(200).json(booksByFilter)
       }catch(error){
          throw new AplicationError(error.message)
       }
